@@ -8,14 +8,15 @@ on:
     paths:
       - 'petty_BE/**'
       - '.github/workflows/build-image.yml'
+
   workflow_dispatch:
 
 env:
   AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: petty-be
+  ECR_REPOSITORY: petty_care_vms_mycopy
 
 permissions:
-  id-token: write   # Required for OIDC token request
+  id-token: write
   contents: read
 
 jobs:
@@ -42,11 +43,13 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
+
         run: |
           SHORT_SHA="${IMAGE_TAG::7}"
           IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY"
 
           echo "Building image: $IMAGE_URI:$SHORT_SHA"
+
           docker build \
             -t "$IMAGE_URI:latest" \
             -t "$IMAGE_URI:$SHORT_SHA" \
@@ -56,7 +59,6 @@ jobs:
           docker push "$IMAGE_URI:$SHORT_SHA"
 
           echo "image=$IMAGE_URI:$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "✅ Pushed $IMAGE_URI:latest and $IMAGE_URI:$SHORT_SHA"
 
       - name: Summary
         run: |
