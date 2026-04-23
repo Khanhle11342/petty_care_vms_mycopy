@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: petty_care_vms_mycopy
+  AWS_REGION: us-west-2
+  ECR_REPOSITORY: kbackend
 
 permissions:
   id-token: write
@@ -31,7 +31,7 @@ jobs:
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::392446151551:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
@@ -43,7 +43,6 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-
         run: |
           SHORT_SHA="${IMAGE_TAG::7}"
           IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY"
